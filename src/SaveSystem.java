@@ -1,11 +1,14 @@
 import java.io.*;
+import java.util.List;
 
 public class SaveSystem  {
 
-    private String dataFolder = getWorkingDirectory()+"checkListData/";
-    private String settingsName = "settings.set";
+    private static String dataFolder = getWorkingDirectory()+"/checkListData/";
+    private static String settingsName = "settings.set";
 
-    private String getWorkingDirectory(){
+    private static String listFolder = "lists/";
+
+    private static String getWorkingDirectory(){
         String workingDirectory;
         String OS = (System.getProperty("os.name")).toUpperCase();
 
@@ -28,28 +31,51 @@ public class SaveSystem  {
 
     }
 
-    public void saveSettingFunction(){
+    public static boolean saveSettingFunction(){
         try{
+            new File(dataFolder).mkdir();
+
             FileOutputStream file = new FileOutputStream(dataFolder + settingsName);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(file);
             objectOutputStream.writeObject(Main.settings);
             objectOutputStream.close();
             file.close();
-
+            return true;
         }catch (IOException ex){
             System.out.println("IOEexcption is caught");
         }
-
+        return false;
 
     }
 
-    public void loadSettingFunction(){
+    public static boolean loadSettingFunction(){
 
         try {
+            new File(dataFolder).mkdir();
             FileInputStream file = new FileInputStream(dataFolder + settingsName);
             ObjectInputStream in = new ObjectInputStream(file);
 
             Main.settings = (Settings) in.readObject();
+            in.close();
+            file.close();
+            return true;
+        }catch (IOException ex){
+            System.out.println("caught an error");
+        }catch (ClassNotFoundException classNotFoundException){
+            System.out.println("class not found");
+        }
+        return false;
+
+    }
+
+    public static ItemList loadList(String listName){
+        ItemList list = null;
+        try {
+            new File(dataFolder+listFolder).mkdir();
+            FileInputStream file = new FileInputStream(dataFolder + listFolder +listName+".denmark");
+            ObjectInputStream in = new ObjectInputStream(file);
+
+            list = (ItemList) in.readObject();
             in.close();
             file.close();
         }catch (IOException ex){
@@ -58,10 +84,23 @@ public class SaveSystem  {
             System.out.println("class not found");
         }
 
-
+        return list;
     }
 
+    public static boolean saveListFunction(ItemList list){
+        try{
+            new File(dataFolder+listFolder).mkdir();
+            FileOutputStream file = new FileOutputStream(dataFolder+listFolder + list.name + ".denmark");
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(file);
+            objectOutputStream.writeObject(list);
+            objectOutputStream.close();
+            file.close();
+            return true;
+        }catch (IOException ex){
+            System.out.println("IOEexcption is caught");
+        }
 
-
+        return false;
+    }
 
 }
