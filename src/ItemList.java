@@ -12,5 +12,23 @@ public class ItemList implements Serializable {
         this.name = name;
     }
 
+    public void addItem(Item item){
+        items.add(item);
+    }
+
+    public void removeItem( String name){
+        //seized and redistrubted from stackoverflow
+        items.removeIf(item ->  item.getName().equals(name));
+    }
+
+    public void changeAmount(String name,int amount){
+        //also seized and redistributed from stackoverflow
+        items.forEach(item -> {
+            if (name.contains(item.getName())) {
+                item.setAmount(amount);
+            }
+        });
+    }
+
 
 }
