@@ -21,7 +21,7 @@ public class ItemList implements Serializable {
         }
     }
 
-    public void removeItem(String name,boolean check){
+    public void toggleItem(String name,boolean check){
         //seized and redistrubted from stackoverflow
         items.forEach(item ->  { if(item.getName().equals(name)){
             item.setCheck(check);
