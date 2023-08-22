@@ -1,7 +1,6 @@
-public class settings {
+import java.io.Serializable;
 
-
-
+public class Settings implements Serializable {
 
     private int _amount = 0;
 
