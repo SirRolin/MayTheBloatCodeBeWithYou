@@ -10,7 +10,7 @@ public class TextIO implements IO{
     public ArrayList<Predicate<String>> mainMenuCommands = new ArrayList<>();
     public ArrayList<Predicate<String>> settingsCommands = new ArrayList<>();
     public ArrayList<Predicate<String>> listCommands = new ArrayList<>();
-    private String activeList = null;
+    private ItemList activeList = null;
 
 
 
@@ -18,12 +18,13 @@ public class TextIO implements IO{
     public void initiate() {
         setupMainMenu();
         setupSettings();
+        setupListFunctions();
     }
 
     private void setupMainMenu(){
         /* Go to Settings */
         mainMenuCommands.add(s -> {
-            if(s.equalsIgnoreCase("settings")){
+            if(s.trim().equalsIgnoreCase("settings")){
                 activeScene = Scene.settings;
                 System.out.println("Current Settings: ");
                 System.out.println("Default Amount: " + Main.settings.getAmount());
@@ -36,9 +37,20 @@ public class TextIO implements IO{
             }
             return false;
         });
+        /* Help */
+        mainMenuCommands.add(s -> {
+            if(findPattern(s.trim(), "(\\?|help)")){
+                System.out.println("commands:");
+                System.out.println("Settings - goes to settings");
+                System.out.println("quit, exit, back - stops the program");
+                System.out.println("create, new, create new <list name> - creates a new list with the name <list name> (only accepts letters, numbers and underscores)");
+                return true;
+            }
+            return false;
+        });
         /* Quit */
         mainMenuCommands.add(s -> {
-            if(findPattern(s, "(quit|exit)")){
+            if(findPattern(s, "(quit|exit|back)")){
                 closeProgram = true;
                 return true;
             }
@@ -46,9 +58,9 @@ public class TextIO implements IO{
         });
         /* Create List */
         mainMenuCommands.add(s -> {
-            final String PATTERN = "(create|new|create new) (?<list>[a-z0-9_]+)";
+            final String PATTERN = "(create|new|create new) (?<list>[a-z0-9_]+)$";
             if(findPattern(s, PATTERN)){
-                activeList = returnPattern(s, PATTERN).group("list");
+                activeList = new ItemList(returnPattern(s, PATTERN).group("list"));
                 activeScene = Scene.list;
                 return true;
             }
@@ -56,10 +68,15 @@ public class TextIO implements IO{
         });
         /* goto list */
         mainMenuCommands.add(s -> {
-            final String PATTERN = "(list|goto|goto list) (?<list>[a-z0-9_]+)";
+            final String PATTERN = "(list|goto|goto list) (?<list>[a-z0-9_]+)$";
             if(findPattern(s, PATTERN)){
-                activeList = returnPattern(s, PATTERN).group("list");
-                activeScene = Scene.list;
+                String listName = returnPattern(s, PATTERN).group("list");
+                activeList = SaveSystem.loadList(listName);
+                if(activeList != null) {
+                    activeScene = Scene.list;
+                } else {
+                    System.out.println("List " + listName + " not found.");
+                }
                 return true;
             }
             return false;
@@ -69,7 +86,7 @@ public class TextIO implements IO{
     private void setupSettings() {
         /* check */
         settingsCommands.add(s -> {
-            final String PATTERN = "check ?(?<answer>[a-z0-9])?";
+            final String PATTERN = "check ?(?<answer>[a-z0-9])?$";
             if(findPattern(s, PATTERN)){
                 String answer = returnPattern(s, PATTERN).group("list");
                 switch(answer.toLowerCase()){
@@ -87,6 +104,7 @@ public class TextIO implements IO{
                     }
                     default -> {
                         System.out.println("invalid argument - valid arguments: yes/no, true/false, 1/0, toggle");
+                        return false;
                     }
                 }
                 return true;
@@ -103,22 +121,87 @@ public class TextIO implements IO{
                 } else if(!answer.equals("")) {
                     Main.settings.setAmount(Integer.parseInt(answer));
                 } else {
-                    System.out.println("default amount: " + Main.settings.getAmount());
+                    System.out.println("Default amount: " + Main.settings.getAmount());
                 }
                 return true;
             }
             return false;
         });
-        /*  */
+        /* leave settings*/
+        settingsCommands.add(s -> {
+            if(findPattern(s.trim(), "^(back|leave)")){
+                activeScene = Scene.mainMenu;
+                return true;
+            }
+            return false;
+        });
+        /* Quit program */
+        settingsCommands.add(s -> {
+            if(findPattern(s, "^(quit|exit)")){
+                activeScene = Scene.mainMenu;
+                closeProgram = true;
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private void setupListFunctions() {
+        /* add item */
+        listCommands.add(s -> {
+            final String PATTERN = "add (?<answer>[a-z_]+)?";
+            if(findPattern(s, PATTERN)){
+                String answer = returnPattern(s, PATTERN).group("list");
+                /* TODO add item to active list */
+            }
+            return false;
+        });
+        /* delete item */
+        listCommands.add(s -> {
+            final String PATTERN = "(delete|remove|d|del|rem) (?<answer>[a-z_]+)?";
+            if(findPattern(s, PATTERN)){
+                String answer = returnPattern(s, PATTERN).group("list");
+                /* TODO remove item from active list */
+            }
+            return false;
+        });
+        /* toggle check on item */
+        listCommands.add(s -> {
+            final String PATTERN = "(check|uncheck|c|toggle) (?<answer>[a-z_]+)?";
+            if(findPattern(s, PATTERN)){
+                String answer = returnPattern(s, PATTERN).group("list");
+                /* TODO Toggle item from active list */
+            }
+            return false;
+        });
+        /* change amount on item */
+        listCommands.add(s -> {
+            final String PATTERN = "(change )?(a|amount) (?<answer>[0-9]+)?";
+            if(findPattern(s, PATTERN)){
+                String answer = returnPattern(s, PATTERN).group("answer");
+                /* TODO Toggle item from active list */
+            }
+            return false;
+        });
+        /* go back */
+        listCommands.add(s -> {
+            final String PATTERN = "back";
+            if(findPattern(s, PATTERN)){
+                /* TODO Save the List */
+                activeScene = Scene.mainMenu;
+                return true;
+            }
+            return false;
+        });
     }
 
     private boolean findPattern(String in, String find){
-        Pattern quitting = Pattern.compile(find, Pattern.CASE_INSENSITIVE);
-        return quitting.matcher(in).find();
+        Pattern patt = Pattern.compile(find, Pattern.CASE_INSENSITIVE);
+        return patt.matcher(in).find();
     }
 
     private Matcher returnPattern(String in, String find){
-        Pattern quitting = Pattern.compile(find, Pattern.CASE_INSENSITIVE);
-        return quitting.matcher(in);
+        Pattern patt = Pattern.compile(find, Pattern.CASE_INSENSITIVE);
+        return patt.matcher(in);
     }
 }
