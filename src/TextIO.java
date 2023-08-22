@@ -1,5 +1,6 @@
 import java.sql.SQLOutput;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -7,18 +8,55 @@ import java.util.regex.Pattern;
 public class TextIO implements IO{
     private boolean closeProgram = false;
     private Scene activeScene = Scene.mainMenu;
-    public ArrayList<Predicate<String>> mainMenuCommands = new ArrayList<>();
-    public ArrayList<Predicate<String>> settingsCommands = new ArrayList<>();
-    public ArrayList<Predicate<String>> listCommands = new ArrayList<>();
+    private final ArrayList<Predicate<String>> mainMenuCommands = new ArrayList<>();
+    private final ArrayList<Predicate<String>> settingsCommands = new ArrayList<>();
+    private final ArrayList<Predicate<String>> listCommands = new ArrayList<>();
     private ItemList activeList = null;
 
 
 
     @Override
     public void initiate() {
+        activeScene = Scene.mainMenu;
         setupMainMenu();
         setupSettings();
         setupListFunctions();
+    }
+
+    public void run() {
+        Scanner sc = new Scanner(System.in);
+        while(!closeProgram){
+            String outInput = sc.nextLine();
+            switch(activeScene){
+                case mainMenu -> {
+                    TestOnList(mainMenuCommands, outInput);
+                }
+                case list -> {
+                    TestOnList(settingsCommands, outInput);
+                }
+                case settings ->{
+                    TestOnList(listCommands, outInput);
+                }
+            }
+        }
+    }
+
+    private void TestOnList(ArrayList<Predicate<String>> mainMenuCommands, String outInput) {
+        boolean accompliced = false;
+        for (Predicate<String> comm : mainMenuCommands) {
+            if (comm.test(outInput)) {
+                accompliced = true;
+                break;
+            }
+        }
+        if(!accompliced) {
+            message("Command " + outInput + " was not recognised.");
+        }
+    }
+
+    @Override
+    public void message(String msg) {
+        System.out.println(msg);
     }
 
     private void setupMainMenu(){
