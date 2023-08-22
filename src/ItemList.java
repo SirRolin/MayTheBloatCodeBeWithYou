@@ -21,10 +21,10 @@ public class ItemList implements Serializable {
         }
     }
 
-    public void toggleItem(String name,boolean check){
+    public void toggleItem(String name){
         //seized and redistrubted from stackoverflow
         items.forEach(item ->  { if(item.getName().equals(name)){
-            item.setCheck(check);
+            item.toggleCheck();
         }
     });}
 
