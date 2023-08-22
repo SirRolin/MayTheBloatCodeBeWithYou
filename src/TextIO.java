@@ -1,3 +1,4 @@
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -16,7 +17,7 @@ public class TextIO implements IO{
     @Override
     public void initiate() {
         setupMainMenu();
-        SetupSettings();
+        setupSettings();
     }
 
     private void setupMainMenu(){
@@ -24,12 +25,13 @@ public class TextIO implements IO{
         mainMenuCommands.add(s -> {
             if(s.equalsIgnoreCase("settings")){
                 activeScene = Scene.settings;
-                System.out.println("current settings: ");
-                System.out.println("default amount: " + settings.getAmount());
-                System.out.println("default checked: " + settings.isCheck());
-                System.out.println("First Sort:"); /* needs sorting rules in settings done */
-                System.out.println("Second Sort:");
-                System.out.println("Third Sort:");
+                System.out.println("Current Settings: ");
+                System.out.println("Default Amount: " + Main.settings.getAmount());
+                System.out.println("Default Checked: " + Main.settings.isCheck());
+                System.out.println("When to Sort: "); /* needs sorting rules in settings done */
+                System.out.println("First Sort: ");
+                System.out.println("Second Sort: ");
+                System.out.println("Third Sort: ");
                 return true;
             }
             return false;
@@ -64,7 +66,7 @@ public class TextIO implements IO{
         });
     }
 
-    private void SetupSettings() {
+    private void setupSettings() {
         /* check */
         settingsCommands.add(s -> {
             final String PATTERN = "check ?(?<answer>[a-z0-9])?";
@@ -72,16 +74,16 @@ public class TextIO implements IO{
                 String answer = returnPattern(s, PATTERN).group("list");
                 switch(answer.toLowerCase()){
                     case "yes", "true", "1" -> {
-                        settings.setCheck(true);
+                        Main.settings.setCheck(true);
                     }
                     case "no", "false", "0" -> {
-                        settings.setCheck(false);
+                        Main.settings.setCheck(false);
                     }
                     case "toggle" -> {
-                        settings.setCheck(!settings.isCheck());
+                        Main.settings.setCheck(!Main.settings.isCheck());
                     }
                     case "" -> {
-                        System.out.println("Check is: " + settings.isCheck());
+                        System.out.println("Check is: " + Main.settings.isCheck());
                     }
                     default -> {
                         System.out.println("invalid argument - valid arguments: yes/no, true/false, 1/0, toggle");
@@ -99,9 +101,9 @@ public class TextIO implements IO{
                 if(answer.contains("-")){
                     System.out.println("Can only take positive numbers");
                 } else if(!answer.equals("")) {
-                    settings.setAmount(Integer.parseInt(answer));
+                    Main.settings.setAmount(Integer.parseInt(answer));
                 } else {
-                    System.out.println("default amount: " + settings.getAmount());
+                    System.out.println("default amount: " + Main.settings.getAmount());
                 }
                 return true;
             }
