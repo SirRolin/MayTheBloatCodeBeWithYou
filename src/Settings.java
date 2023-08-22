@@ -8,6 +8,9 @@ public class Settings {
     public Settings (){
     }
 
+    
+
+
 
     public int getAmount() {
         return amount;
