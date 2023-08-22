@@ -10,6 +10,9 @@ public class Settings {
         this.check = check;
     }
 
+    
+
+
 
     public int getAmount() {
         return amount;
