@@ -1,4 +1,4 @@
-public class Settings {
+public class settings {
 
 
 

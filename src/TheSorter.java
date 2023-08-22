@@ -3,22 +3,17 @@ import java.util.Collections;
 
 public class TheSorter {
 
+    private static int settingsChecker(String setting){
 
-    public TheSorter (){
-
-    }
-
-    private int settingsChecker(String isChecked){
-
-        if(Settings.getFirstSort().equals(isChecked) ){
+        if(Main.settings.getFirstSort().equals(setting) ){
             return 100;
         }
 
-        else if(Settings.getSecondSort().equals(isChecked)){
+        else if(Main.settings.getSecondSort().equals(setting)){
             return 10;
         }
 
-        else if(Settings.getThirdSort().equals(isChecked)){
+        else if(Main.settings.getThirdSort().equals(setting)){
             return 1;
         }
 
@@ -28,20 +23,17 @@ public class TheSorter {
 
     }
 
-    public List<Item> nameSorter(List<Item> listToBeNameSorted){
 
-         Collections.sort(listToBeNameSorted, (Item1, Item2) -> (Item1.getName().compareTo(Item2.getName())));
-
-        return listToBeNameSorted;
-    }
-
-
-    public List<Item> numberSorter(List<Item> listToBeSortedByNumbers){
+    public static List<Item> itemSorter(List<Item> listToBeSortedByNumbers){
 
 
         Collections.sort(listToBeSortedByNumbers, (Item1, Item2) ->
                 (
-                        (10 * Boolean.compare(Item1.isCheck(), Item2.isCheck())) + (Item1.getName().compareTo(Item2.getName()))
+                        (settingsChecker("check") * Boolean.compare(Item1.isCheck(), Item2.isCheck())) +
+                        (settingsChecker("name") *Item1.getName().compareTo(Item2.getName()) +
+                        (settingsChecker("amount") * ((int)Math.signum(Item1.getAmount()-Item2.getAmount()))))
+
+
                 ));
 
         return listToBeSortedByNumbers;
