@@ -21,6 +21,11 @@ public class TextIO implements IO{
         setupListFunctions();
     }
 
+    @Override
+    public void message(String msg) {
+        System.out.println(msg);
+    }
+
     private void setupMainMenu(){
         /* Go to Settings */
         mainMenuCommands.add(s -> {
