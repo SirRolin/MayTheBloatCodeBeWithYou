@@ -1,5 +1,5 @@
 public class Main {
-    public static Settings settings = new Settings();
+    public static settings settings = new settings();
     public static void main(String[] args) {
 
     }
