@@ -21,9 +21,15 @@ public class ItemList implements Serializable {
         }
     }
 
-    public void removeItem( String name){
+    public void toggleItem(String name,boolean check){
         //seized and redistrubted from stackoverflow
-        items.removeIf(item ->  item.getName().equals(name));
+        items.forEach(item ->  { if(item.getName().equals(name)){
+            item.setCheck(check);
+        }
+    });}
+
+    public void removeItem(String name){
+        items.removeIf(item -> item.getName().equals(name));
     }
 
     public void changeAmount(String name,int amount){
