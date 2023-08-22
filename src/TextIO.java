@@ -1,4 +1,3 @@
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.function.Predicate;
@@ -28,15 +27,9 @@ public class TextIO implements IO{
         while(!closeProgram){
             String outInput = sc.nextLine();
             switch(activeScene){
-                case mainMenu -> {
-                    TestOnList(mainMenuCommands, outInput);
-                }
-                case list -> {
-                    TestOnList(settingsCommands, outInput);
-                }
-                case settings ->{
-                    TestOnList(listCommands, outInput);
-                }
+                case mainMenu -> TestOnList(mainMenuCommands, outInput);
+                case list -> TestOnList(settingsCommands, outInput);
+                case settings -> TestOnList(listCommands, outInput);
             }
         }
     }
@@ -49,9 +42,7 @@ public class TextIO implements IO{
                 break;
             }
         }
-        if(!accompliced) {
-            message("Command " + outInput + " was not recognised.");
-        }
+        if(!accompliced) message("Command " + outInput + " was not recognised.");
     }
 
     @Override
@@ -128,18 +119,10 @@ public class TextIO implements IO{
             if(findPattern(s, PATTERN)){
                 String answer = returnPattern(s, PATTERN).group("list");
                 switch(answer.toLowerCase()){
-                    case "yes", "true", "1" -> {
-                        Main.settings.setCheck(true);
-                    }
-                    case "no", "false", "0" -> {
-                        Main.settings.setCheck(false);
-                    }
-                    case "toggle" -> {
-                        Main.settings.setCheck(!Main.settings.isCheck());
-                    }
-                    case "" -> {
-                        System.out.println("Check is: " + Main.settings.isCheck());
-                    }
+                    case "yes", "true", "1" -> Main.settings.setCheck(true);
+                    case "no", "false", "0" -> Main.settings.setCheck(false);
+                    case "toggle" -> Main.settings.setCheck(!Main.settings.isCheck());
+                    case "" -> System.out.println("Check is: " + Main.settings.isCheck());
                     default -> {
                         System.out.println("invalid argument - valid arguments: yes/no, true/false, 1/0, toggle");
                         return false;
@@ -189,8 +172,8 @@ public class TextIO implements IO{
         listCommands.add(s -> {
             final String PATTERN = "add (?<answer>[a-z_]+)?";
             if(findPattern(s, PATTERN)){
-                String answer = returnPattern(s, PATTERN).group("list");
-                /* TODO add item to active list */
+                String answer = returnPattern(s, PATTERN).group("answer");
+                activeList.addItem(new Item(answer));
             }
             return false;
         });
@@ -198,8 +181,8 @@ public class TextIO implements IO{
         listCommands.add(s -> {
             final String PATTERN = "(delete|remove|d|del|rem) (?<answer>[a-z_]+)?";
             if(findPattern(s, PATTERN)){
-                String answer = returnPattern(s, PATTERN).group("list");
-                /* TODO remove item from active list */
+                String answer = returnPattern(s, PATTERN).group("answer");
+                activeList.removeItem(answer);
             }
             return false;
         });
@@ -207,17 +190,35 @@ public class TextIO implements IO{
         listCommands.add(s -> {
             final String PATTERN = "(check|uncheck|c|toggle) (?<answer>[a-z_]+)?";
             if(findPattern(s, PATTERN)){
-                String answer = returnPattern(s, PATTERN).group("list");
-                /* TODO Toggle item from active list */
+                final String answer = returnPattern(s, PATTERN).group("answer");
+                if(answer.isEmpty()) {
+                    message("try: toggle <amount>");
+                } else {
+                    /* TODO replace with ItemLists own toggle check */
+                    activeList.items.forEach(item -> {
+                        if (item.getName().contains(answer)) {
+                            item.toggleCheck();
+                        }
+                    });
+                }
             }
             return false;
         });
         /* change amount on item */
         listCommands.add(s -> {
-            final String PATTERN = "(change )?(a|amount) (?<answer>[0-9]+)?";
-            if(findPattern(s, PATTERN)){
-                String answer = returnPattern(s, PATTERN).group("answer");
-                /* TODO Toggle item from active list */
+            final String PATTERN = "(change )?(a|amount) ?(?<item>[a-z_()])? ?(?<answer>[0-9]+)?";
+            if(findPattern(s.trim(), PATTERN)){
+                String item = returnPattern(s.trim(), PATTERN).group("item");
+                String answer = returnPattern(s.trim(), PATTERN).group("answer");
+                if(item.isBlank() || answer.isBlank()) {
+                    message("try: amount <item> <amount>");
+                } else {
+                    try {
+                        activeList.changeAmount(item, Integer.parseInt(answer));
+                    } catch (Exception ignored) {
+                        message("Can't parse \"" + answer + "\" must be an error on our side, sorry.");
+                    }
+                }
             }
             return false;
         });
