@@ -13,7 +13,12 @@ public class ItemList implements Serializable {
     }
 
     public void addItem(Item item){
-        items.add(item);
+        if(items.contains(item)){
+            System.out.println("item already in place please don't add it again");
+        }else {
+            items.add(item);
+            System.out.println("ITEM : "+item.getName()+ " added to the list");
+        }
     }
 
     public void removeItem( String name){
@@ -26,6 +31,7 @@ public class ItemList implements Serializable {
         items.forEach(item -> {
             if (name.contains(item.getName())) {
                 item.setAmount(amount);
+                System.out.println("Items amount have been changed new amount is: "+item.getAmount());
             }
         });
     }
