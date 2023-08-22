@@ -1,13 +1,11 @@
 public class Settings {
 
-    private int amount;
+    private int amount = 0;
 
-    private boolean check;
+    private boolean check = false;
 
 
-    public Settings (int amount,boolean check){
-        this.amount = amount;
-        this.check = check;
+    public Settings (){
     }
 
 
