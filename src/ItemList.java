@@ -21,6 +21,15 @@ public class ItemList implements Serializable {
         }
     }
 
+    public Item getItem (String name){
+        //shamelessly stolen from here https://stackoverflow.com/questions/53719097/retrieve-single-object-from-list-using-java8-stream-api
+        return items.stream()
+                .filter(item -> item.getName().equals(name))
+                .findFirst()
+                .orElse(null);
+
+    }
+
     public void toggleItem(String name){
         //seized and redistrubted from stackoverflow
         items.forEach(item ->  { if(item.getName().equals(name)){
