@@ -26,11 +26,8 @@ class ItemListTest {
         boolean checkCheck;
         if (itemList2.items.contains(apple)){
             checkCheck = apple.isCheck();
-            System.out.println(checkCheck);
             apple.toggleCheck();
-            checkCheck = apple.isCheck();
-            System.out.println(checkCheck);
-            System.out.println("it worked!");
+            assertNotEquals(checkCheck,apple.isCheck());
         }else {
             System.out.println("object not found please try again");
         }
@@ -59,7 +56,7 @@ class ItemListTest {
         itemList.addItem(banana);
         assertEquals(0,banana.getAmount());
         if(itemList.getItem(banana.getName()) != null){
-            banana.setAmount(10);
+            itemList.changeAmount("banana",10);
         }
         assertEquals(10,banana.getAmount());
 
