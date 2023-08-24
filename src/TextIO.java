@@ -22,21 +22,22 @@ public class TextIO implements IO{
         setupListFunctions();
     }
 
+    @Override
     public void run() {
         Scanner sc = new Scanner(System.in);
         while(!closeProgram){
             String outInput = sc.nextLine();
             switch(activeScene){
                 case mainMenu -> TestOnList(mainMenuCommands, outInput);
-                case list -> TestOnList(settingsCommands, outInput);
-                case settings -> TestOnList(listCommands, outInput);
+                case list -> TestOnList(listCommands, outInput);
+                case settings -> TestOnList(settingsCommands, outInput);
             }
         }
     }
 
-    private void TestOnList(ArrayList<Predicate<String>> mainMenuCommands, String outInput) {
+    private void TestOnList(ArrayList<Predicate<String>> commandList, String outInput) {
         boolean accompliced = false;
-        for (Predicate<String> comm : mainMenuCommands) {
+        for (Predicate<String> comm : commandList) {
             if (comm.test(outInput)) {
                 accompliced = true;
                 break;
@@ -87,9 +88,10 @@ public class TextIO implements IO{
         });
         /* Create List */
         mainMenuCommands.add(s -> {
-            final String PATTERN = "(create|new|create new) (?<list>[a-z0-9_]+)$";
-            if(findPattern(s, PATTERN)){
-                activeList = new ItemList(returnPattern(s, PATTERN).group("list"));
+            final String PATTERN = "(create|new|create new) (?<list>[A-z0-9_]+)$";
+            Matcher match = returnPattern(s, PATTERN);
+            if(match.find()){
+                activeList = new ItemList(match.group("list"));
                 activeScene = Scene.list;
                 return true;
             }
@@ -97,9 +99,10 @@ public class TextIO implements IO{
         });
         /* goto list */
         mainMenuCommands.add(s -> {
-            final String PATTERN = "(list|goto|goto list) (?<list>[a-z0-9_]+)$";
-            if(findPattern(s, PATTERN)){
-                String listName = returnPattern(s, PATTERN).group("list");
+            final String PATTERN = "(list|goto|goto list) (?<list>[A-z0-9_]+)$";
+            Matcher match = returnPattern(s, PATTERN);
+            if(match.find()){
+                String listName = match.group("list");
                 activeList = SaveSystem.loadList(listName);
                 if(activeList != null) {
                     activeScene = Scene.list;
@@ -115,9 +118,10 @@ public class TextIO implements IO{
     private void setupSettings() {
         /* check */
         settingsCommands.add(s -> {
-            final String PATTERN = "check ?(?<answer>[a-z0-9])?$";
-            if(findPattern(s, PATTERN)){
-                String answer = returnPattern(s, PATTERN).group("list");
+            final String PATTERN = "check ?(?<answer>[A-z0-9])?$";
+            Matcher match = returnPattern(s, PATTERN);
+            if(match.find()){
+                String answer = match.group("list");
                 switch(answer.toLowerCase()){
                     case "yes", "true", "1" -> Main.settings.setCheck(true);
                     case "no", "false", "0" -> Main.settings.setCheck(false);
@@ -135,8 +139,9 @@ public class TextIO implements IO{
         /* amount */
         settingsCommands.add(s -> {
             final String PATTERN = "amount ?(?<answer>[\\-0-9]+)?";
-            if(findPattern(s, PATTERN)){
-                String answer = returnPattern(s, PATTERN).group("list");
+            Matcher match = returnPattern(s, PATTERN);
+            if(match.find()){
+                String answer = match.group("list");
                 if(answer.contains("-")){
                     System.out.println("Can only take positive numbers");
                 } else if(!answer.equals("")) {
@@ -170,51 +175,54 @@ public class TextIO implements IO{
     private void setupListFunctions() {
         /* add item */
         listCommands.add(s -> {
-            final String PATTERN = "add (?<answer>[a-z_]+)?";
-            if(findPattern(s, PATTERN)){
-                String answer = returnPattern(s, PATTERN).group("answer");
+            final String PATTERN = "add (?<answer>[A-z_]+)?";
+            Matcher match = returnPattern(s, PATTERN);
+            if(match.find()){
+                String answer = match.group("answer");
                 activeList.addItem(new Item(answer));
+                return true;
             }
             return false;
         });
         /* delete item */
         listCommands.add(s -> {
-            final String PATTERN = "(delete|remove|d|del|rem) (?<answer>[a-z_]+)?";
-            if(findPattern(s, PATTERN)){
-                String answer = returnPattern(s, PATTERN).group("answer");
+            final String PATTERN = "(delete|remove|d|del|rem) (?<answer>[A-z_]+)?";
+            Matcher match = returnPattern(s, PATTERN);
+            if(match.find()){
+                String answer = match.group("answer");
                 activeList.removeItem(answer);
+                return true;
             }
             return false;
         });
         /* toggle check on item */
         listCommands.add(s -> {
-            final String PATTERN = "(check|uncheck|c|toggle) (?<answer>[a-z_]+)?";
-            if(findPattern(s, PATTERN)){
-                final String answer = returnPattern(s, PATTERN).group("answer");
+            final String PATTERN = "(check|uncheck|c|toggle) (?<answer>[A-z_]+)?";
+            Matcher match = returnPattern(s, PATTERN);
+            if(match.find()){
+                final String answer = match.group("answer");
                 if(answer.isEmpty()) {
                     message("try: toggle <amount>");
                 } else {
-                    /* TODO replace with ItemLists own toggle check */
-                    activeList.items.forEach(item -> {
-                        if (item.getName().contains(answer)) {
-                            item.toggleCheck();
-                        }
-                    });
+                    activeList.toggleItem(answer);
+                    return true;
                 }
             }
             return false;
         });
         /* change amount on item */
         listCommands.add(s -> {
-            final String PATTERN = "(change )?(a|amount) ?(?<item>[a-z_()])? ?(?<answer>[0-9]+)?";
-            if(findPattern(s.trim(), PATTERN)){
-                String item = returnPattern(s.trim(), PATTERN).group("item");
-                String answer = returnPattern(s.trim(), PATTERN).group("answer");
+            final String PATTERN = "^(change )?(a|amount) ?(?<item>[a-z_()])? ?(?<answer>[0-9]+)?$";
+            Matcher match = returnPattern(s, PATTERN);
+            if(match.find()){
+                String item = match.group("item");
+                String answer = match.group("answer");
                 if(item.isBlank() || answer.isBlank()) {
                     message("try: amount <item> <amount>");
                 } else {
                     try {
                         activeList.changeAmount(item, Integer.parseInt(answer));
+                        return true;
                     } catch (Exception ignored) {
                         message("Can't parse \"" + answer + "\" must be an error on our side, sorry.");
                     }
@@ -226,7 +234,8 @@ public class TextIO implements IO{
         listCommands.add(s -> {
             final String PATTERN = "back";
             if(findPattern(s, PATTERN)){
-                /* TODO Save the List */
+                SaveSystem.saveListFunction(activeList);
+                activeList = null;
                 activeScene = Scene.mainMenu;
                 return true;
             }
