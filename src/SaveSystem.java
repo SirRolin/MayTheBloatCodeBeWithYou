@@ -33,7 +33,7 @@ public class SaveSystem  {
 
     public static boolean saveSettingFunction(){
         try{
-            new File(dataFolder).mkdir();
+            new File(dataFolder).mkdirs();
 
             FileOutputStream file = new FileOutputStream(dataFolder + settingsName);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(file);
@@ -51,7 +51,7 @@ public class SaveSystem  {
     public static boolean loadSettingFunction(){
 
         try {
-            new File(dataFolder).mkdir();
+            new File(dataFolder).mkdirs();
             FileInputStream file = new FileInputStream(dataFolder + settingsName);
             ObjectInputStream in = new ObjectInputStream(file);
 
@@ -71,7 +71,7 @@ public class SaveSystem  {
     public static ItemList loadList(String listName){
         ItemList list = null;
         try {
-            new File(dataFolder+listFolder).mkdir();
+            new File(dataFolder+listFolder).mkdirs();
             FileInputStream file = new FileInputStream(dataFolder + listFolder +listName+".denmark");
             ObjectInputStream in = new ObjectInputStream(file);
 
@@ -89,7 +89,7 @@ public class SaveSystem  {
 
     public static boolean saveListFunction(ItemList list){
         try{
-            new File(dataFolder+listFolder).mkdir();
+            new File(dataFolder+listFolder).mkdirs();
             FileOutputStream file = new FileOutputStream(dataFolder+listFolder + list.name + ".denmark");
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(file);
             objectOutputStream.writeObject(list);
