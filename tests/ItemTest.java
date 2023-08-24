@@ -13,10 +13,8 @@ class ItemTest {
 
         Item banana = new Item("banana");
         checkTheCheck = banana.isCheck();
-        assertEquals(checkTheCheck,banana.isCheck());
         banana.toggleCheck();
-        checkTheCheck = banana.isCheck();
-        assertEquals(checkTheCheck,banana.isCheck());
+        assertNotEquals(checkTheCheck,banana.isCheck());
 
     }
 

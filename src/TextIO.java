@@ -141,7 +141,7 @@ public class TextIO implements IO{
             final String PATTERN = "amount ?(?<answer>[\\-0-9]+)?";
             Matcher match = returnPattern(s, PATTERN);
             if(match.find()){
-                String answer = match.group("list");
+                String answer = match.group("answer");
                 if(answer.contains("-")){
                     System.out.println("Can only take positive numbers");
                 } else if(!answer.equals("")) {
