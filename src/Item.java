@@ -19,6 +19,10 @@ public class Item implements Serializable {
         check = !check;
         return check;
     }
+    @Override
+    public String toString(){
+        return "check: " +check + " amount: "+amount+ " name: "+name;
+    }
 
 
     public boolean isCheck() {
