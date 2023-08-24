@@ -13,10 +13,6 @@ public class Settings implements Serializable {
     private String _thirdSort = "amount";
 
 
-
-
-
-
     public int getAmount() {
         return _amount;
 
@@ -33,11 +29,6 @@ public class Settings implements Serializable {
     public void setCheck(boolean check) {
         _check = check;
     }
-
-
-
-
-    public void createSettingsMenu(){}
 
     public String getFirstSort() {
         return _firstSort;
