@@ -1,10 +1,16 @@
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Scanner;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TextIO implements IO{
+    public enum Scene {
+        mainMenu,
+        settings,
+        list
+    }
     private boolean closeProgram = false;
     private Scene activeScene = Scene.mainMenu;
     private final ArrayList<Predicate<String>> mainMenuCommands = new ArrayList<>();
@@ -24,8 +30,12 @@ public class TextIO implements IO{
 
     @Override
     public void run() {
+        message("Hi, this is the command prototype of CheckList (Name Pending)");
+        message("Please type something underneath to enter your commands.");
+        message("the following commands are available: settings, help, ?, create, create new, new, quit, back, exit, list, goto, goto list");
         Scanner sc = new Scanner(System.in);
         while(!closeProgram){
+            System.out.print("command: ");
             String outInput = sc.nextLine();
             switch(activeScene){
                 case mainMenu -> TestOnList(mainMenuCommands, outInput);
@@ -74,6 +84,7 @@ public class TextIO implements IO{
                 System.out.println("Settings - goes to settings");
                 System.out.println("quit, exit, back - stops the program");
                 System.out.println("create, new, create new <list name> - creates a new list with the name <list name> (only accepts letters, numbers and underscores)");
+                System.out.println("goto, list, goto list <list name> - opens list with the name <list name> (only accepts letters, numbers and underscores)");
                 return true;
             }
             return false;
@@ -234,6 +245,7 @@ public class TextIO implements IO{
         listCommands.add(s -> {
             final String PATTERN = "back";
             if(findPattern(s, PATTERN)){
+                activeList = TheSorter.itemSorter(activeList);
                 SaveSystem.saveListFunction(activeList);
                 activeList = null;
                 activeScene = Scene.mainMenu;

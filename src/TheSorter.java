@@ -1,9 +1,10 @@
+import java.util.Collection;
 import java.util.List;
 import java.util.Collections;
 
 public class TheSorter {
 
-    private static int settingsChecker(String setting){
+    public static int settingsChecker(String setting){
 
         if(Main.settings.getFirstSort().equals(setting) ){
             return 100;
@@ -24,19 +25,32 @@ public class TheSorter {
     }
 
 
-    public static List<Item> itemSorter(List<Item> listToBeSortedByNumbers){
+    public static ItemList itemSorter(ItemList itemList){
+        /* Debugging */
+//        for (Item item: itemList.items
+//             ) {
+//            System.out.println((item.isCheck() ? "[X] " : "[ ] ") + item.getName());
+//        }
+        /* Using ItemComparator we sort it */
+        List<Item> list = new java.util.ArrayList<>(itemList.items.stream().toList());
+        list.sort(new ItemComparator());
 
+        /* Tried sorting this way, didn't like it */
+//        itemList.items.sort((Item1, Item2) ->
+//                (
+//                        (settingsChecker("check") * Boolean.compare(((Item) Item1).isCheck(), ((Item) Item2).isCheck())) +
+//                                (settingsChecker("name") * ((Item) Item1).getName().compareTo(((Item) Item2).getName()) +
+//                                        (settingsChecker("amount") * (int) Math.signum(((Item) Item1).getAmount() - ((Item) Item2).getAmount())))
+//                ));
 
-        Collections.sort(listToBeSortedByNumbers, (Item1, Item2) ->
-                (
-                        (settingsChecker("check") * Boolean.compare(Item1.isCheck(), Item2.isCheck())) +
-                        (settingsChecker("name") *Item1.getName().compareTo(Item2.getName()) +
-                        (settingsChecker("amount") * ((int)Math.signum(Item1.getAmount()-Item2.getAmount()))))
+        /* Debugging */
+//        for (Item item: list
+//        ) {
+//            System.out.println((item.isCheck() ? "[X] " : "[ ] ") + item.getName());
+//        }
+        itemList.items = list;
 
-
-                ));
-
-        return listToBeSortedByNumbers;
+        return itemList;
     }
 
 
