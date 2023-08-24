@@ -1,6 +1,6 @@
 import java.io.Serializable;
 
-public class Item implements Serializable {
+public class Item implements Serializable, Comparable {
 
     private boolean check;
     private int amount;
@@ -47,5 +47,12 @@ public class Item implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public int compareTo(Object Item2) {
+        return (TheSorter.settingsChecker("check") * Boolean.compare(this.isCheck(), ((Item) Item2).isCheck())) +
+                (TheSorter.settingsChecker("name") * (this.getName().compareTo(((Item) Item2).getName()))) +
+                (TheSorter.settingsChecker("amount") * (int) Math.signum((this.getAmount() - ((Item) Item2).getAmount())));
     }
 }
